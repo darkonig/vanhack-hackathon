@@ -33,11 +33,6 @@ public class DataProcessCSV implements DataProcessor {
                 .withSkipLines(0)
                 .withCSVParser(parser)
                 .build()) {
-            String[] csvCols = csvReader.readNext();
-            if (csvCols == null) {
-
-            }
-
             List<String> cols = Arrays.asList(getRow(csvReader));
 
             String[] sample1 = getRow(csvReader);
@@ -69,9 +64,7 @@ public class DataProcessCSV implements DataProcessor {
 
             List<String> cols = Arrays.asList(getRow(csvReader));
 
-            cfg.forEach(e -> {
-                e.setCsvColumnIndex(cols.indexOf(e.getCsvColumn()));
-            });
+            cfg.forEach(e -> e.setCsvColumnIndex(cols.indexOf(e.getCsvColumn())) );
 
             List<Map<String, String>> values = new ArrayList<>();
             String[] csvRow;

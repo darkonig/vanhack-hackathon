@@ -37,13 +37,8 @@ public class MigrationControllerTest {
     private MockMvc mockMvc;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
-    }
-
-    @Test
-    public void update() {
-
     }
 
     @Test

@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -35,15 +37,20 @@ public class MigrationController {
     public ResponseEntity<?> update(@RequestParam("file") MultipartFile file) {
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String name = UUID.randomUUID().toString() + "." + extension;
-        File tmp = new File(tmpDir + name);
+        Path path = Paths.get(tmpDir);
+        File tmp = Paths.get(tmpDir, name).toFile();
 
         try {
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
             file.transferTo(tmp);
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ErrorMessage.builder()
                             .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-                            .message("Error on saving file").build());
+                            .message("Error on saving file.").build());
         }
 
         return ResponseEntity.ok(FileUpdateResponse.builder()
@@ -56,13 +63,21 @@ public class MigrationController {
         logger.debug("[MigrationController] Load cols from {}", fileName);
         DataProcessor processor = DataProcessorFactory.get(fileName);
 
+        if (processor == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ErrorMessage.builder()
+                            .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                            .message("No processor to this type of file.").build());
+        }
+
         try {
             return ResponseEntity.ok(processor.getColumns(Paths.get(tmpDir, fileName)));
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ErrorMessage.builder()
                             .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-                            .message("Error on reading file").build());
+                            .message("Error on reading file.").build());
         }
     }
 
@@ -71,14 +86,22 @@ public class MigrationController {
         logger.debug("[MigrationController] Processing from {}", fileName);
         DataProcessor processor = DataProcessorFactory.get(fileName);
 
+        if (processor == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ErrorMessage.builder()
+                            .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                            .message("No processor to this type of file.").build());
+        }
+
         try {
             DataTable dataTable = processor.getDataTable(Paths.get(tmpDir, fileName), columns.getColumns());
             return ResponseEntity.ok(dataTable);
         } catch (IOException e) {
+            logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ErrorMessage.builder()
                             .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-                            .message("Error on reading file").build());
+                            .message("Error on reading file.").build());
         }
     }
 }

@@ -5,9 +5,6 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
-faireservice:
-  url: http://www.faire-stage.com
-
 logging.level.com.faire: debug
 
-tmpDir: /tmp/hackathon
+tmpDir: /tmp/hackathon/
