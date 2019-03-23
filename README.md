@@ -88,8 +88,8 @@ Response:
 
 ## Parse to a specific structure:
 
-```cmd
-POST http://localhost:8082/migration/data.migration.csv
+```http
+POST http://localhost:8082/migration/{filename}
 ```
 
 Body
