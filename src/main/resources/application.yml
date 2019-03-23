@@ -1,0 +1,13 @@
+server:
+  port: 8082
+
+spring:
+  jackson:
+    default-property-inclusion: non_null
+
+faireservice:
+  url: http://www.faire-stage.com
+
+logging.level.com.faire: debug
+
+tmpDir: /tmp/hackathon
